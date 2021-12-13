@@ -20,13 +20,20 @@ fn day5(lines: &[Line]) -> usize {
             for x in min(line.0, line.2)..=max(line.0, line.2) {
                 grid[x * ROWS + line.1] += 1;
             }
-        } else {
-            let top_left = (min(line.0, line.2), min(line.1, line.3));
-            let bottom_right = (min(line.0, line.2), min(line.1, line.3));
         }
     }
 
     grid.iter().filter(|x| **x > 1).count()
+}
+
+fn approach(start: usize, target: usize) -> usize {
+    if start < target {
+        start + 1
+    } else if start > target {
+        start - 1
+    } else {
+        start
+    }
 }
 
 fn day5_2(lines: &[Line]) -> usize {
@@ -35,17 +42,20 @@ fn day5_2(lines: &[Line]) -> usize {
     let mut grid: Vec<usize> = vec![0; ROWS * COLS];
 
     for line in lines {
-        if line.0 == line.2 {
-            dbg!(line);
-            for x in min(line.1, line.3)..=max(line.1, line.3) {
-                grid[line.0 * ROWS + x] += 1;
+        dbg!(line);
+        let target = (line.2, line.3);
+
+        let mut current = (line.0, line.1);
+
+        loop {
+            //dbg!(current);
+            grid[current.0 * ROWS + current.1] += 1;
+
+            if current == target {
+                break;
             }
-        }
-        if line.1 == line.3 {
-            dbg!(line);
-            for x in min(line.0, line.2)..=max(line.0, line.2) {
-                grid[x * ROWS + line.1] += 1;
-            }
+
+            current = (approach(current.0, target.0), approach(current.1, target.1));
         }
     }
 
@@ -99,7 +109,7 @@ fn day5_2_example() {
 fn day5_2_actual() {
     let input = DAY5_INPUT;
 
-    assert_eq!(day5_2(input), 1);
+    assert_eq!(day5_2(input), 20012);
 }
 
 const DAY5_INPUT: &[Line] = &[

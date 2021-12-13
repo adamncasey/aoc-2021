@@ -1,5 +1,5 @@
 
-fn dayn(game: &BingoGame) -> usize {
+fn day6(game: &BingoGame) -> usize {
     0
 }
 
@@ -15,20 +15,20 @@ fn read_input(input: String) -> &str {
 }
 
 #[test]
-fn day4_example() {
+fn day6_example() {
     let input= "";
 
-    let game = read_game(input.to_string());
+    let input = read_input(input.to_string());
 
-    assert_eq!(day4(&game), 4512);
+    assert_eq!(day6(&input), 4512);
 }
 
 #[test]
-fn day4_actual() {
-    let input= std::fs::read_to_string("./input/dayn.txt")
+fn day6_actual() {
+    let input= std::fs::read_to_string("./input/day6.txt")
         .unwrap();
 
-    let game = read_game(input.to_string());
+    let input = read_input(input.to_string());
 
-    assert_eq!(day4(&game), 49686);
+    assert_eq!(day6(&input), 49686);
 }
