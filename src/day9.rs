@@ -1,4 +1,4 @@
-fn neighbours(x: usize, y: usize, xbounds: usize, ybounds: usize) -> Vec<(usize, usize)> {
+pub fn neighbours(x: usize, y: usize, xbounds: usize, ybounds: usize) -> Vec<(usize, usize)> {
     let mut result = Vec::new();
     if y > 0 {
         result.push((x, y - 1));
@@ -26,9 +26,16 @@ fn is_lowest(value: u32, sqs: &[(usize, usize)], game: &Vec<Vec<u32>>) -> bool {
     return true;
 }
 
-fn basin_size(x: usize, y: usize, game: &Vec<Vec<u32>>, seen: &mut [bool], xlen: usize, ylen: usize) -> usize {
+fn basin_size(
+    x: usize,
+    y: usize,
+    game: &Vec<Vec<u32>>,
+    seen: &mut [bool],
+    xlen: usize,
+    ylen: usize,
+) -> usize {
     if seen[y * xlen + x] || game[y][x] == 9 {
-        return 0
+        return 0;
     }
 
     seen[y * xlen + x] = true;
@@ -46,7 +53,7 @@ fn basin_size(x: usize, y: usize, game: &Vec<Vec<u32>>, seen: &mut [bool], xlen:
 fn day9(game: &Vec<Vec<u32>>) -> u32 {
     let ylen = game.len();
     let xlen = game[0].len();
-    let mut  total_lowest_risk = 0;
+    let mut total_lowest_risk = 0;
 
     for y in 0..game.len() {
         for x in 0..game[y].len() {
@@ -64,10 +71,15 @@ fn day9(game: &Vec<Vec<u32>>) -> u32 {
 }
 
 fn print_seen(seen: &Vec<bool>) {
-    let seen_ch = seen.iter().map(|s| if *s { 'x'} else {' '}).collect::<Vec<char>>();
+    let seen_ch = seen
+        .iter()
+        .map(|s| if *s { 'x' } else { ' ' })
+        .collect::<Vec<char>>();
 
-
-    let seen_str: Vec<String> = seen_ch.chunks(10).map(|c| c.iter().collect::<String>()).collect();
+    let seen_str: Vec<String> = seen_ch
+        .chunks(10)
+        .map(|c| c.iter().collect::<String>())
+        .collect();
     println!("{}", seen_str.join("\n"));
 }
 
@@ -92,9 +104,14 @@ fn day9_2(game: &Vec<Vec<u32>>) -> u32 {
     basin_sizes.sort();
     dbg!(&basin_sizes);
 
-    basin_sizes.iter().rev().take(3).cloned().reduce(|a, b| a * b).unwrap() as u32
+    basin_sizes
+        .iter()
+        .rev()
+        .take(3)
+        .cloned()
+        .reduce(|a, b| a * b)
+        .unwrap() as u32
 }
-
 
 fn read_input(input: String) -> Vec<Vec<u32>> {
     let input: Vec<Vec<u32>> = input
@@ -130,7 +147,6 @@ fn day9_actual() {
 
     assert_eq!(day9(&input), 496);
 }
-
 
 #[test]
 fn day9_2_example() {

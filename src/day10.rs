@@ -38,7 +38,7 @@ fn opposite(ch: char) -> char {
 
 enum Error {
     Corrupt(char),
-    Incomplete(Vec<char>)
+    Incomplete(Vec<char>),
 }
 
 fn incorrect(input: &str) -> Error {
@@ -46,14 +46,12 @@ fn incorrect(input: &str) -> Error {
 
     for ch in input.chars() {
         match ch {
-            ')' | ']' | '}' | '>' => {
-                match stack.pop() {
-                    None => return Error::Corrupt(ch),
-                    Some(x) => {
-                        if ch != opposite(x) {
-                            return Error::Corrupt(ch)
-                        }
-                    },
+            ')' | ']' | '}' | '>' => match stack.pop() {
+                None => return Error::Corrupt(ch),
+                Some(x) => {
+                    if ch != opposite(x) {
+                        return Error::Corrupt(ch);
+                    }
                 }
             },
             _ => stack.push(ch),
@@ -69,7 +67,6 @@ fn day10(lines: &Vec<String>) -> u64 {
         dbg!(line);
         let error = incorrect(line);
         if let Error::Corrupt(x) = error {
-            
             dbg!((line, x, syntax_cost(x)));
             total_error += syntax_cost(x);
         }
@@ -104,7 +101,7 @@ fn read_input(input: String) -> Vec<String> {
 
 #[test]
 fn day10_example() {
-    let input= "[({(<(())[]>[[{[]{<()<>>
+    let input = "[({(<(())[]>[[{[]{<()<>>
 [(()[<>])]({[<{<<[]>>(
 {([(<{}[<>[]}>{[]{[(<()>
 (((({<>}<{<{<>}{[]{[]{}
@@ -122,8 +119,7 @@ fn day10_example() {
 
 #[test]
 fn day10_actual() {
-    let input= std::fs::read_to_string("./input/day10.txt")
-        .unwrap();
+    let input = std::fs::read_to_string("./input/day10.txt").unwrap();
 
     let input = read_input(input.to_string());
 
@@ -132,7 +128,7 @@ fn day10_actual() {
 
 #[test]
 fn day10_2_example() {
-    let input= "[({(<(())[]>[[{[]{<()<>>
+    let input = "[({(<(())[]>[[{[]{<()<>>
 [(()[<>])]({[<{<<[]>>(
 {([(<{}[<>[]}>{[]{[(<()>
 (((({<>}<{<{<>}{[]{[]{}
@@ -150,8 +146,7 @@ fn day10_2_example() {
 
 #[test]
 fn day10_2_actual() {
-    let input= std::fs::read_to_string("./input/day10.txt")
-        .unwrap();
+    let input = std::fs::read_to_string("./input/day10.txt").unwrap();
 
     let input = read_input(input.to_string());
 

@@ -47,7 +47,7 @@ fn day1_part2_example() {
 
 #[test]
 fn day1_part2_actual() {
-    let input: Vec<u32> = std::fs::read_to_string("./input/day1_2.txt")
+    let input: Vec<u32> = std::fs::read_to_string("./input/day1.txt")
         .unwrap()
         .lines()
         .map(|str| str::parse::<u32>(str).unwrap())
