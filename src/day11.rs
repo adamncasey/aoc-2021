@@ -82,7 +82,7 @@ fn day11(octo: &mut Vec<Vec<u32>>, days: usize) -> usize {
     total
 }
 
-fn day11_2(octo: &mut Vec<Vec<u32>>, days: usize) -> usize {
+fn day11_2(octo: &mut Vec<Vec<u32>>, _days: usize) -> usize {
     let mut day = 1;
     loop {
         let flashes = day11_step(octo);

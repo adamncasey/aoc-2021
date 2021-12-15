@@ -6,7 +6,7 @@ fn day12(
     seen: &mut HashSet<String>,
     current: &str,
     small_cave_revisited: Option<&str>,
-    route: &mut Vec<String>
+    route: &mut Vec<String>,
 ) -> usize {
     if current == "end" {
         println!("{:?}", &route);
@@ -85,7 +85,16 @@ b-end";
 
     let mut input = read_input(input.to_string());
 
-    assert_eq!(day12(&mut input, &mut HashSet::new(), "start", Some("Nope"), &mut Vec::new()), 10);
+    assert_eq!(
+        day12(
+            &mut input,
+            &mut HashSet::new(),
+            "start",
+            Some("Nope"),
+            &mut Vec::new()
+        ),
+        10
+    );
 }
 
 #[test]
@@ -103,7 +112,16 @@ kj-dc";
 
     let mut input = read_input(input.to_string());
 
-    assert_eq!(day12(&mut input, &mut HashSet::new(), "start", Some("Nope"), &mut Vec::new()), 19);
+    assert_eq!(
+        day12(
+            &mut input,
+            &mut HashSet::new(),
+            "start",
+            Some("Nope"),
+            &mut Vec::new()
+        ),
+        19
+    );
 }
 
 #[test]
@@ -129,7 +147,16 @@ start-RW";
 
     let mut input = read_input(input.to_string());
 
-    assert_eq!(day12(&mut input, &mut HashSet::new(), "start", Some("Nope"), &mut Vec::new()), 226);
+    assert_eq!(
+        day12(
+            &mut input,
+            &mut HashSet::new(),
+            "start",
+            Some("Nope"),
+            &mut Vec::new()
+        ),
+        226
+    );
 }
 
 #[test]
@@ -138,7 +165,16 @@ fn day12_actual() {
 
     let mut input = read_input(input.to_string());
 
-    assert_eq!(day12(&mut input, &mut HashSet::new(), "start", Some("Nope"), &mut Vec::new()), 3421);
+    assert_eq!(
+        day12(
+            &mut input,
+            &mut HashSet::new(),
+            "start",
+            Some("Nope"),
+            &mut Vec::new()
+        ),
+        3421
+    );
 }
 
 #[test]
@@ -153,7 +189,16 @@ b-end";
 
     let mut input = read_input(input.to_string());
 
-    assert_eq!(day12(&mut input, &mut HashSet::new(), "start", None, &mut Vec::new()), 36);
+    assert_eq!(
+        day12(
+            &mut input,
+            &mut HashSet::new(),
+            "start",
+            None,
+            &mut Vec::new()
+        ),
+        36
+    );
 }
 
 #[test]
@@ -171,7 +216,16 @@ kj-dc";
 
     let mut input = read_input(input.to_string());
 
-    assert_eq!(day12(&mut input, &mut HashSet::new(), "start", None, &mut Vec::new()), 103);
+    assert_eq!(
+        day12(
+            &mut input,
+            &mut HashSet::new(),
+            "start",
+            None,
+            &mut Vec::new()
+        ),
+        103
+    );
 }
 
 #[test]
@@ -197,7 +251,16 @@ start-RW";
 
     let mut input = read_input(input.to_string());
 
-    assert_eq!(day12(&mut input, &mut HashSet::new(), "start", None, &mut Vec::new()), 3509);
+    assert_eq!(
+        day12(
+            &mut input,
+            &mut HashSet::new(),
+            "start",
+            None,
+            &mut Vec::new()
+        ),
+        3509
+    );
 }
 
 #[test]
@@ -206,5 +269,14 @@ fn day12_2_actual() {
 
     let mut input = read_input(input.to_string());
 
-    assert_eq!(day12(&mut input, &mut HashSet::new(), "start", None, &mut Vec::new()), 84870);
+    assert_eq!(
+        day12(
+            &mut input,
+            &mut HashSet::new(),
+            "start",
+            None,
+            &mut Vec::new()
+        ),
+        84870
+    );
 }
