@@ -7,7 +7,7 @@ struct Packet {
 
 #[derive(Debug, PartialEq, Eq)]
 enum Value {
-    Literal(u32),
+    Literal(u64),
     Operator(Operator),
 }
 
@@ -45,8 +45,8 @@ impl BitVec {
             panic!("Asked for more than 16 bits");
         }
 
-        if n < 8 {
-            self.read(8) as u16
+        if n <= 8 {
+            self.read(n) as u16
         } else {
             let remainder = n - 8;
             ((self.read(8) as u16) << remainder) | self.read(remainder) as u16
@@ -100,7 +100,7 @@ fn count_versions(packet: &Packet) -> usize {
 
     match &packet.value {
         Value::Literal(_) => version_count,
-        Value::Operator(Operator {_typeid, subpackets}) => {
+        Value::Operator(Operator {typeid: _, subpackets}) => {
             version_count + subpackets.iter().map(count_versions).sum::<usize>()
         }
     }
@@ -138,20 +138,20 @@ fn day16_2(packet: Packet) -> usize {
 }
 
 fn read_literal(bits: &mut BitVec) -> Value {
-    let mut num: u32 = 0;
+    let mut num: u64 = 0;
     
     loop {
         let last = bits.read(1) == 0;
 
         num = num << 4;
-        num = num | (bits.read(4) as u32);
+        num = num | (bits.read(4) as u64);
 
         if last {
             break;
         }
     }
 
-    Value::Literal(num)
+    Value::Literal(num.try_into().unwrap())
 }
 
 fn read_operator(typeid: u8, bits: &mut BitVec) -> Value {
@@ -239,7 +239,7 @@ fn day16_actual() {
 
     let input = read_input(&input);
 
-    assert_eq!(day16(input), 1615);
+    assert_eq!(day16(input), 886);
 }
 
 #[test]
@@ -276,5 +276,5 @@ fn day16_2_actual() {
 
     let input = read_input(&input);
 
-    assert_eq!(day16_2(input), 1615);
+    assert_eq!(day16_2(input), 184487454837);
 }
