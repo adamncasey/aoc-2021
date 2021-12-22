@@ -1,7 +1,7 @@
 use crate::day9::neighbours;
 
-use std::collections::BinaryHeap;
 use std::cmp::Ordering;
+use std::collections::BinaryHeap;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 struct SearchNode {
@@ -11,7 +11,9 @@ struct SearchNode {
 
 impl Ord for SearchNode {
     fn cmp(&self, other: &Self) -> Ordering {
-        other.cost.cmp(&self.cost)
+        other
+            .cost
+            .cmp(&self.cost)
             .then_with(|| self.pos.cmp(&other.pos))
     }
 }
@@ -25,7 +27,10 @@ fn day15(map: &Vec<Vec<u32>>, dest: (usize, usize)) -> u32 {
     let mut heap: BinaryHeap<SearchNode> = BinaryHeap::new();
 
     dbg!(dest);
-    heap.push(SearchNode { cost: 0, pos: (0, 0) });
+    heap.push(SearchNode {
+        cost: 0,
+        pos: (0, 0),
+    });
 
     let mut dists = vec![u32::MAX; map.len() * map[0].len()];
 
@@ -41,7 +46,7 @@ fn day15(map: &Vec<Vec<u32>>, dest: (usize, usize)) -> u32 {
         }
 
         let (x, y) = node.pos;
-        for neighbour in neighbours(x, y, dest.0 + 1, dest.1 +1 ) {           
+        for neighbour in neighbours(x, y, dest.0 + 1, dest.1 + 1) {
             let next_cost = map[neighbour.1][neighbour.0] + node.cost;
 
             if next_cost >= dists[neighbour.1 * map.len() + neighbour.0] {
@@ -49,7 +54,10 @@ fn day15(map: &Vec<Vec<u32>>, dest: (usize, usize)) -> u32 {
                 continue;
             }
 
-            heap.push(SearchNode { cost: next_cost, pos: neighbour});
+            heap.push(SearchNode {
+                cost: next_cost,
+                pos: neighbour,
+            });
             dists[neighbour.1 * map.len() + neighbour.0] = next_cost;
         }
     }
@@ -60,12 +68,12 @@ fn day15(map: &Vec<Vec<u32>>, dest: (usize, usize)) -> u32 {
 fn expand_grid(map: &Vec<Vec<u32>>) -> Vec<Vec<u32>> {
     let dimensions = map.len();
 
-    let mut expanded = vec![vec![0u32; dimensions *5]; dimensions *5];
+    let mut expanded = vec![vec![0u32; dimensions * 5]; dimensions * 5];
 
-    for y in 0..dimensions*5 {
-        for x in 0..dimensions*5 {
-            let (xclamp, yclamp) = (x%dimensions, y % dimensions);
-            let (xgrid, ygrid) = (x/dimensions, y/dimensions);
+    for y in 0..dimensions * 5 {
+        for x in 0..dimensions * 5 {
+            let (xclamp, yclamp) = (x % dimensions, y % dimensions);
+            let (xgrid, ygrid) = (x / dimensions, y / dimensions);
             //dbg!((xclamp, yclamp, xgrid, ygrid));
 
             let new_value = map[yclamp][xclamp] + (xgrid + ygrid) as u32;
@@ -110,7 +118,7 @@ fn day15_example() {
 
     let input = read_input(input.to_string());
 
-    assert_eq!(day15(&input, (9,9)), 40);
+    assert_eq!(day15(&input, (9, 9)), 40);
 }
 
 #[test]
@@ -119,7 +127,7 @@ fn day15_actual() {
 
     let input = read_input(input.to_string());
 
-    assert_eq!(day15(&input, (99,99)), 373);
+    assert_eq!(day15(&input, (99, 99)), 373);
 }
 
 #[test]
@@ -137,7 +145,7 @@ fn day15_2_example() {
 
     let input = read_input(input.to_string());
 
-    assert_eq!(day15_2(&input, (49,49)), 315);
+    assert_eq!(day15_2(&input, (49, 49)), 315);
 }
 
 #[test]
@@ -146,7 +154,7 @@ fn day15_2_actual() {
 
     let input = read_input(input.to_string());
 
-    assert_eq!(day15_2(&input, (499,499)), 2868);
+    assert_eq!(day15_2(&input, (499, 499)), 2868);
 }
 
 #[test]

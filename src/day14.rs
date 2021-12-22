@@ -18,22 +18,21 @@ fn day14(input: Input, steps: usize) -> usize {
 
     let mut chars: HashMap<char, usize> = HashMap::new();
     for (key, value) in pair_map.iter() {
-        *chars.entry(key.1).or_default() += value;  
+        *chars.entry(key.1).or_default() += value;
     }
     *chars.entry(first).or_default() += 1;
 
     let min = chars.values().min().unwrap();
     let max = chars.values().max().unwrap();
-    
+
     max - min
 }
 
 fn pair_insert(pair_map: &mut HashMap<(char, char), usize>, rules: &HashMap<(char, char), char>) {
-
     let mut new_pair_map: HashMap<(char, char), usize> = HashMap::new();
     for (key, value) in pair_map.iter_mut() {
         match rules.get(key) {
-            None => {*new_pair_map.entry(*key).or_default() += *value},
+            None => *new_pair_map.entry(*key).or_default() += *value,
             Some(insert) => {
                 *new_pair_map.entry((key.0, *insert)).or_default() += *value;
                 *new_pair_map.entry((*insert, key.1)).or_default() += *value;

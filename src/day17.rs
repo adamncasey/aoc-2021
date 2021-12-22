@@ -10,14 +10,18 @@ fn within(pos: (i32, i32), xbounds: (i32, i32), ybounds: (i32, i32)) -> bool {
     false
 }
 
-fn max_height_intersect(start_v: (i32, i32), xbounds: (i32, i32), ybounds: (i32, i32)) -> Option<i32> {
+fn max_height_intersect(
+    start_v: (i32, i32),
+    xbounds: (i32, i32),
+    ybounds: (i32, i32),
+) -> Option<i32> {
     let mut max_height = 0;
 
     let mut pos = (0, 0);
     let mut velocity = start_v;
 
     let mut steps = 0;
-    
+
     loop {
         pos = (pos.0 + velocity.0, pos.1 + velocity.1);
         max_height = max(max_height, pos.1);
@@ -56,7 +60,6 @@ fn day17(xbounds: (i32, i32), ybounds: (i32, i32)) -> i32 {
 
     max_height
 }
-
 
 fn day17_2(xbounds: (i32, i32), ybounds: (i32, i32)) -> i32 {
     let mut count = 0;
@@ -104,4 +107,3 @@ fn day17_2_actual() {
 
     assert_eq!(day17_2(xbounds, ybounds), 5200);
 }
-

@@ -1,4 +1,3 @@
-
 #[derive(Debug, PartialEq, Eq)]
 struct Packet {
     version: u8,
@@ -14,7 +13,7 @@ enum Value {
 #[derive(Debug, PartialEq, Eq)]
 struct Operator {
     typeid: u8,
-    subpackets: Vec<Packet>
+    subpackets: Vec<Packet>,
 }
 
 #[derive(Debug)]
@@ -40,7 +39,7 @@ impl BitVec {
     }
 
     /// Read at most 16 bits
-    fn read16 (&mut self, n: u8) -> u16 {
+    fn read16(&mut self, n: u8) -> u16 {
         if n > 16 {
             panic!("Asked for more than 16 bits");
         }
@@ -100,16 +99,21 @@ fn count_versions(packet: &Packet) -> usize {
 
     match &packet.value {
         Value::Literal(_) => version_count,
-        Value::Operator(Operator {typeid: _, subpackets}) => {
-            version_count + subpackets.iter().map(count_versions).sum::<usize>()
-        }
+        Value::Operator(Operator {
+            typeid: _,
+            subpackets,
+        }) => version_count + subpackets.iter().map(count_versions).sum::<usize>(),
     }
 }
 
 fn resolve_operator(op: &Operator) -> usize {
     match op.typeid {
         0 => op.subpackets.iter().map(resolve_packet).sum::<usize>(),
-        1 => op.subpackets.iter().map(resolve_packet).fold(1, |acc, next| acc * next),
+        1 => op
+            .subpackets
+            .iter()
+            .map(resolve_packet)
+            .fold(1, |acc, next| acc * next),
         2 => op.subpackets.iter().map(resolve_packet).min().unwrap(),
         3 => op.subpackets.iter().map(resolve_packet).max().unwrap(),
         5 => (resolve_packet(&op.subpackets[0]) > resolve_packet(&op.subpackets[1])) as usize,
@@ -122,9 +126,7 @@ fn resolve_operator(op: &Operator) -> usize {
 fn resolve_packet(packet: &Packet) -> usize {
     match &packet.value {
         Value::Literal(x) => (*x) as usize,
-        Value::Operator(op) => {
-            resolve_operator(&op)
-        }
+        Value::Operator(op) => resolve_operator(&op),
     }
 }
 
@@ -139,7 +141,7 @@ fn day16_2(packet: Packet) -> usize {
 
 fn read_literal(bits: &mut BitVec) -> Value {
     let mut num: u64 = 0;
-    
+
     loop {
         let last = bits.read(1) == 0;
 
@@ -169,13 +171,12 @@ fn read_operator(typeid: u8, bits: &mut BitVec) -> Value {
         dbg!((num_bits, start_len));
 
         while (start_len - bits.data.len()) < num_bits {
-            
             dbg!((subpackets.len(), start_len - bits.data.len(), num_bits));
             subpackets.push(read_packet(bits));
         }
     }
 
-    Value::Operator(Operator {typeid, subpackets})
+    Value::Operator(Operator { typeid, subpackets })
 }
 
 fn read_packet(bits: &mut BitVec) -> Packet {
@@ -189,7 +190,7 @@ fn read_packet(bits: &mut BitVec) -> Packet {
         _ => read_operator(typeid, bits),
     };
 
-    Packet { version, value}
+    Packet { version, value }
 }
 
 fn read_input(input: &str) -> Packet {
@@ -200,20 +201,43 @@ fn read_input(input: &str) -> Packet {
 
 #[test]
 fn day16_input_literal() {
-    assert_eq!(read_input("D2FE28"), Packet { version: 6, value: Value::Literal(2021)});
+    assert_eq!(
+        read_input("D2FE28"),
+        Packet {
+            version: 6,
+            value: Value::Literal(2021)
+        }
+    );
 }
 
 #[test]
 fn day16_input_operator() {
-    assert_eq!(read_input("38006F45291200"), Packet { version: 1, value: Value::Operator(Operator {
-        typeid: 6,
-        subpackets: vec![Packet { version: 6, value: Value::Literal(10)}, Packet { version: 2, value: Value::Literal(20)}]
-    })});
+    assert_eq!(
+        read_input("38006F45291200"),
+        Packet {
+            version: 1,
+            value: Value::Operator(Operator {
+                typeid: 6,
+                subpackets: vec![
+                    Packet {
+                        version: 6,
+                        value: Value::Literal(10)
+                    },
+                    Packet {
+                        version: 2,
+                        value: Value::Literal(20)
+                    }
+                ]
+            })
+        }
+    );
 }
 
 #[test]
 fn day16_bitvec_read16() {
-    let mut x = BitVec { data: vec![true, true, false, true, false, true, false, true, false]};
+    let mut x = BitVec {
+        data: vec![true, true, false, true, false, true, false, true, false],
+    };
 
     assert_eq!(x.read16(9), 171);
 }
@@ -268,7 +292,6 @@ fn day16_2_example1() {
     let input = read_input("9C0141080250320F1802104A08");
     assert_eq!(day16_2(input), 1);
 }
-
 
 #[test]
 fn day16_2_actual() {
