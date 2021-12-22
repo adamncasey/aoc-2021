@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use std::collections::HashSet;
+use std::collections::HashMap;
 
 type Position = (i32, i32, i32);
 
@@ -40,6 +40,44 @@ fn get_transform_by_id(transform_id: usize) -> (Direction, usize) {
     transforms[transform_id]
 }
 
+fn harry_transform_by_id(rotation: usize, pos: &Position) -> Position
+{
+  let mut out: Position = (0,0,0);
+  match rotation {
+    0 => { out.0 =  pos.0; out.1 =  pos.1; out.2 = pos.2; },
+    1 => { out.0 =  pos.1; out.1 = -pos.0; out.2 = pos.2; },
+    2 => { out.0 = -pos.1; out.1 =  pos.0; out.2 = pos.2; },
+    3 => { out.0 = -pos.0; out.1 = -pos.1; out.2 = pos.2; },
+
+    4 => { out.0 =  pos.2; out.1 =  pos.0; out.2 = pos.1; },
+    5 => { out.0 =  pos.0; out.1 = -pos.2; out.2 = pos.1; },
+    6 => { out.0 = -pos.0; out.1 =  pos.2; out.2 = pos.1; },
+    7 => { out.0 = -pos.2; out.1 = -pos.0; out.2 = pos.1; },
+
+    8 =>  { out.0 =  pos.1; out.1 =  pos.2; out.2 = pos.0; },
+    9 =>  { out.0 =  pos.2; out.1 = -pos.1; out.2 = pos.0; },
+    10 => { out.0 = -pos.2; out.1 =  pos.1; out.2 = pos.0; },
+    11 => { out.0 = -pos.1; out.1 = -pos.2; out.2 = pos.0; },
+
+    12 => { out.0 =  pos.1; out.1 =  pos.0; out.2 = -pos.2; },
+    13 => { out.0 =  pos.0; out.1 = -pos.1; out.2 = -pos.2; },
+    14 => { out.0 = -pos.0; out.1 =  pos.1; out.2 = -pos.2; },
+    15 => { out.0 = -pos.1; out.1 = -pos.0; out.2 = -pos.2; },
+
+    16 => { out.0 =  pos.0; out.1 =  pos.2; out.2 = -pos.1; },
+    17 => { out.0 =  pos.2; out.1 = -pos.0; out.2 = -pos.1; },
+    18 => { out.0 = -pos.2; out.1 =  pos.0; out.2 = -pos.1; },
+    19 => { out.0 = -pos.0; out.1 = -pos.2; out.2 = -pos.1; },
+
+    20 => { out.0 =  pos.2; out.1 =  pos.1; out.2 = -pos.0; },
+    21 => { out.0 =  pos.1; out.1 = -pos.2; out.2 = -pos.0; },
+    22 => { out.0 = -pos.1; out.1 =  pos.2; out.2 = -pos.0; },
+    23 => { out.0 = -pos.2; out.1 = -pos.1; out.2 = -pos.0; },
+    _ => panic!("Unhandled transform {:?}", rotation),
+  }
+  return out;
+}
+
 fn transform_by_id(transform_id: usize, pos: &Position) -> Position {
     let (dir, rot) = get_transform_by_id(transform_id);
 
@@ -47,19 +85,6 @@ fn transform_by_id(transform_id: usize, pos: &Position) -> Position {
 }
 
 fn transform(dir: Direction, rotation: usize, pos: &Position) -> Position {
-    
-    // rot  0 = (x,y,z)
-    // rot 90 = (x,-y,z)
-    // rot180 = (-x,-y,z)
-    // rot270 = (x,-y,z)
-    let pos = match rotation {
-        0 => pos.clone(),
-        90 => (pos.0, -pos.1, pos.2),
-        180 => (-pos.0, -pos.1, pos.2),
-        270 => (-pos.0, pos.1, pos.2),
-        _ => panic!("Unsupported rotation {:?}", rotation),
-    };
-
     // face +z: ( 5, 6, 7), (-5,-6,-7) //  = (x,y,z)
     // face -z: (-5, 6,-7), ( 5,-6, 7) //  = (-x,y,-z)
 
@@ -78,6 +103,18 @@ fn transform(dir: Direction, rotation: usize, pos: &Position) -> Position {
         Direction::NegativeX => (pos.2, pos.1, -pos.0),
     };
     
+    // rot  0 = (x,y,z)
+    // rot 90 = (x,-y,z)
+    // rot180 = (-x,-y,z)
+    // rot270 = (x,-y,z)
+    let pos = match rotation {
+        0 => pos.clone(),
+        90 => (pos.0, -pos.1, pos.2),
+        180 => (-pos.0, -pos.1, pos.2),
+        270 => (-pos.0, pos.1, pos.2),
+        _ => panic!("Unsupported rotation {:?}", rotation),
+    };
+    
     pos
 }
 
@@ -85,40 +122,31 @@ fn compute_node_diffs(scanners: &[Vec<Position>]) -> Vec<Vec<Vec<HashSet<Positio
     let mut scanner_diffs = Vec::new();
     for scanner in scanners {
         let mut orientations = Vec::new();
-        for dir in [
-            Direction::PositiveZ,
-            Direction::NegativeZ,
-            Direction::PositiveY,
-            Direction::NegativeY,
-            Direction::PositiveX,
-            Direction::NegativeX,
-        ] {
-            for rotation in [0, 90, 180, 270] {
-                let mut nodes_in_orientation = Vec::new();
+        for transform_id in 0..24 {
+            let mut nodes_in_orientation = Vec::new();
 
-                let rotated_nodes: Vec<Position> = scanner
-                    .iter()
-                    .map(|x| transform(dir, rotation, x))
-                    .collect();
-                for n1 in 0..scanner.len() {
-                    let mut node_orientation_diffs = HashSet::new();
-                    for n2 in 0..scanner.len() {
-                        if n1 == n2 {
-                            continue;
-                        }
-
-                        let node1 = &rotated_nodes[n1];
-                        let node2 = &rotated_nodes[n2];
-                        node_orientation_diffs.insert((
-                            node2.0 - node1.0,
-                            node2.1 - node1.1,
-                            node2.2 - node1.2,
-                        ));
+            let rotated_nodes: Vec<Position> = scanner
+                .iter()
+                .map(|x| harry_transform_by_id(transform_id, x))
+                .collect();
+            for n1 in 0..scanner.len() {
+                let mut node_orientation_diffs = HashSet::new();
+                for n2 in 0..scanner.len() {
+                    if n1 == n2 {
+                        continue;
                     }
-                    nodes_in_orientation.push(node_orientation_diffs);
+
+                    let node1 = &rotated_nodes[n1];
+                    let node2 = &rotated_nodes[n2];
+                    node_orientation_diffs.insert((
+                        node2.0 - node1.0,
+                        node2.1 - node1.1,
+                        node2.2 - node1.2,
+                    ));
                 }
-                orientations.push(nodes_in_orientation);
+                nodes_in_orientation.push(node_orientation_diffs);
             }
+            orientations.push(nodes_in_orientation);
         }
         scanner_diffs.push(orientations);
     }
@@ -126,7 +154,6 @@ fn compute_node_diffs(scanners: &[Vec<Position>]) -> Vec<Vec<Vec<HashSet<Positio
     scanner_diffs
 }
 
-type ScannerId = usize;
 type Orientation = usize;
 
 fn find_match(
@@ -145,7 +172,7 @@ fn find_match(
             if let Some((s1_dir, n1, n2)) =
                 find_match_threshold(&diffs[s1], &diffs[s2], required_matches)
             {
-                let match_point = transform_by_id(s1_dir, &scanners[s1][n1]);
+                let match_point = harry_transform_by_id(s1_dir, &scanners[s1][n1]);
 
                 println!("Matched at {:?} {:?}", &match_point, &scanners[s2][n2]);
                 return Some((s1, s1_dir, diff_pos(&scanners[s2][n2], &match_point), s2));
@@ -156,8 +183,22 @@ fn find_match(
     None
 }
 
-fn day19(mut scanners: Vec<Vec<Position>>, required_matches: usize) -> usize {
+fn manhatten_len(pos: Position) -> usize {
+    (pos.0.abs() + pos.1.abs() + pos.2.abs()).try_into().unwrap()
+}
+
+fn day19(scanners: Vec<Vec<Position>>, required_matches: usize) -> usize {
+    day19_impl(scanners, required_matches).0
+}
+
+fn day19_2(scanners: Vec<Vec<Position>>, required_matches: usize) -> usize {
+    day19_impl(scanners, required_matches).1
+}
+
+fn day19_impl(mut scanners: Vec<Vec<Position>>, required_matches: usize) -> (usize, usize) {
     let mut merged_spaces: HashSet<usize> = HashSet::new();
+
+    let mut offsets: HashMap<usize, Vec<(usize, Position)>> = HashMap::new();
 
     while (scanners.len() - merged_spaces.len()) > 1 {
         let diffs = compute_node_diffs(&scanners);
@@ -170,12 +211,21 @@ fn day19(mut scanners: Vec<Vec<Position>>, required_matches: usize) -> usize {
             find_match(&merged_spaces, &diffs, required_matches, &scanners)
         {
             println!("{:?}", (s1, s1_dir, s1_offset, s2));
+            
+            let s1_offsets = offsets.entry(s1).or_default().clone();
+
+            let s2_offsets = offsets.entry(s2).or_insert_with(Vec::new);
+            s2_offsets.push((s1, s1_offset));
+
+            for x in s1_offsets {
+                s2_offsets.push((x.0, diff_add(&s1_offset, &harry_transform_by_id(s1_dir, &x.1))));
+            }
 
             let mut points: HashSet<Position> = HashSet::from_iter(scanners[s2].iter().cloned());
             points.extend(
                 scanners[s1]
                     .iter()
-                    .map(|x| diff_add(&transform_by_id(s1_dir, x), &s1_offset)),
+                    .map(|x| diff_add(&harry_transform_by_id(s1_dir, x), &s1_offset)),
             );
 
             scanners[s2] = points.into_iter().collect();
@@ -193,14 +243,36 @@ fn day19(mut scanners: Vec<Vec<Position>>, required_matches: usize) -> usize {
         }
     }
 
-    scanners
-        .iter()
-        .enumerate()
-        .filter(|(idx, _)| !merged_spaces.contains(idx))
-        .next()
-        .unwrap()
-        .1
-        .len()
+    let unmerged_idx = (0..scanners.len()).filter(|idx| !merged_spaces.contains(idx)).next().unwrap();
+
+    let mut positions = offsets[&unmerged_idx].clone();
+    positions.push((unmerged_idx, (0,0,0)));
+    
+    println!("Found {} positions: {:?}", positions.len(), &positions);
+
+    let zero_position = positions.iter().filter(|(scanner, _)| *scanner == 0).next().unwrap().1;
+
+    let positions: Vec<(usize, Position)> = positions.iter().map(|(scanner, pos)| (*scanner, diff_pos(&zero_position, pos))).collect();
+
+    println!("Found {} positions: {:?}", positions.len(), &positions);
+
+    let mut max_dist = 0;
+    for pos in 0..positions.len() {
+        for pos2 in 0..positions.len() {
+            if pos == pos2 {
+                continue;
+            }
+
+            let new_value = manhatten_len(diff_pos(&positions[pos2].1, &positions[pos].1));
+            if new_value > max_dist {
+                println!("Found new max {} {:?} {:?}", new_value, positions[pos], positions[pos2]);   
+            }
+            
+            max_dist = std::cmp::max(max_dist, new_value);
+        }
+    }
+
+    (scanners[unmerged_idx].len(), max_dist)
 }
 
 fn find_match_threshold(
@@ -249,6 +321,29 @@ fn read_input(input: &str) -> Vec<Vec<Position>> {
 }
 
 #[test]
+fn day19_compare_transforms() {
+    let p1 = (5,6,7);
+    //let p2 = (-5,-6,-7);
+
+    'outer: for tid in 0..24 {
+        for tid2 in 0..24 {
+            if transform_by_id(tid, &p1) == harry_transform_by_id(tid2, &p1) {
+                println!("{:?} {} matches harry's {}", get_transform_by_id(tid), tid, tid2);
+                continue 'outer;
+            }
+        }
+
+        println!("{:?} {} did not match any of harrys", get_transform_by_id(tid), tid);
+    }
+
+    for tid in 0..24 {
+        println!("transform id {} {:?}", tid, get_transform_by_id(tid));
+        //assert_eq!(transform_by_id(tid, &p1), harry_transform_by_id(tid, &p1));
+        //assert_eq!(transform_by_id(tid, &p2), harry_transform_by_id(tid, &p2));
+    }
+}
+
+#[test]
 fn day19_example1() {
     let input = "--- scanner 0 ---
 0,2,0
@@ -274,6 +369,7 @@ fn day19_example2() {
 
     assert_eq!(day19(input, 6), 6);
 }
+
 #[test]
 fn day19_example2_1() {
     let input = std::fs::read_to_string("./input/day19_example1.txt").unwrap();
@@ -298,8 +394,9 @@ fn day19_example2_1() {
             if s1idx == s2idx {
                 continue;
             }
+
             for orientation in 0..24 {
-                let rotated: Vec<Position> = s1.iter().map(|x| transform_by_id(orientation, x)).collect();
+                let rotated: Vec<Position> = s1.iter().map(|x| harry_transform_by_id(orientation, x)).collect();
 
                 if *s2 == rotated {
                     println!("{} rotated by {:?} matches {}", s1idx, get_transform_by_id(orientation), s2idx);
@@ -321,10 +418,41 @@ fn day19_example3() {
 }
 
 #[test]
+fn day19_2_example3() {
+    let input = std::fs::read_to_string("./input/day19_example.txt").unwrap();
+
+    let input = read_input(&input);
+
+    assert_eq!(day19_2(input, 12), 3621);
+}
+
+#[test]
 fn day19_actual() {
     let input = std::fs::read_to_string("./input/day19.txt").unwrap();
 
     let input = read_input(&input);
 
-    assert_eq!(day19(input, 12), 1615);
+    assert_eq!(day19(input, 12), 330);
+}
+
+#[test]
+fn day19_2_example2() {
+    let input = std::fs::read_to_string("./input/day19_example1.txt").unwrap();
+
+    let input = read_input(&input);
+
+    assert_eq!(day19_2(input, 6), 0);
+}
+
+#[test]
+fn day19_2_actual() {
+    let input = std::fs::read_to_string("./input/day19.txt").unwrap();
+
+    let input = read_input(&input);
+
+    assert_eq!(day19_2(input, 12), 9634);
+
+    // 24382 too high
+    // 21793 too high
+    // not 24382
 }

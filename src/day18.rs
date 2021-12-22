@@ -456,7 +456,7 @@ fn day18_actual() {
 
     let input = read_input(&input);
 
-    assert_eq!(day18(input), 1615);
+    assert_eq!(day18(input), 2907);
 }
 
 #[test]
