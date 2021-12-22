@@ -278,6 +278,19 @@ fn day19_example2() {
 fn day19_example2_1() {
     let input = std::fs::read_to_string("./input/day19_example1.txt").unwrap();
 
+    /* should output all nodes being able to transform to all nodes, but actually outputs:
+    running 1 test 0 rotated by (PositiveY, 180) matches 1
+    0 rotated by (PositiveX, 0) matches 2
+    0 rotated by (NegativeX, 180) matches 3
+    1 rotated by (PositiveY, 180) matches 0
+    1 rotated by (NegativeX, 180) matches 4
+    2 rotated by (NegativeX, 0) matches 0
+    2 rotated by (PositiveZ, 180) matches 3
+    3 rotated by (NegativeX, 180) matches 0
+    3 rotated by (PositiveZ, 180) matches 2
+    4 rotated by (NegativeX, 180) matches 1
+    test day19::day19_example2_1 ... ok
+    */
     let input = read_input(&input);
 
     for (s1idx, s1) in input.iter().enumerate() {
