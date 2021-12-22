@@ -21,7 +21,7 @@ enum Direction {
     NegativeX,
 }
 
-fn transform_by_id(transform_id: usize, pos: &Position) -> Position {
+fn get_transform_by_id(transform_id: usize) -> (Direction, usize) {
     let mut transforms: Vec<(Direction, usize)> = Vec::new();
 
     for dir in [
@@ -37,12 +37,29 @@ fn transform_by_id(transform_id: usize, pos: &Position) -> Position {
         }
     }
 
-    let (dir, rot) = transforms[transform_id];
+    transforms[transform_id]
+}
+
+fn transform_by_id(transform_id: usize, pos: &Position) -> Position {
+    let (dir, rot) = get_transform_by_id(transform_id);
 
     transform(dir, rot, pos)
 }
 
 fn transform(dir: Direction, rotation: usize, pos: &Position) -> Position {
+    
+    // rot  0 = (x,y,z)
+    // rot 90 = (x,-y,z)
+    // rot180 = (-x,-y,z)
+    // rot270 = (x,-y,z)
+    let pos = match rotation {
+        0 => pos.clone(),
+        90 => (pos.0, -pos.1, pos.2),
+        180 => (-pos.0, -pos.1, pos.2),
+        270 => (-pos.0, pos.1, pos.2),
+        _ => panic!("Unsupported rotation {:?}", rotation),
+    };
+
     // face +z: ( 5, 6, 7), (-5,-6,-7) //  = (x,y,z)
     // face -z: (-5, 6,-7), ( 5,-6, 7) //  = (-x,y,-z)
 
@@ -60,18 +77,8 @@ fn transform(dir: Direction, rotation: usize, pos: &Position) -> Position {
         Direction::PositiveX => (-pos.2, pos.1, pos.0),
         Direction::NegativeX => (pos.2, pos.1, -pos.0),
     };
-
-    // rot  0 = (x,y,z)
-    // rot 90 = (-x,y,z)
-    // rot180 = (-x,-y,z)
-    // rot270 = (x,-y,z)
-    match rotation {
-        0 => pos,
-        90 => (-pos.0, pos.1, pos.2),
-        180 => (-pos.0, -pos.1, pos.2),
-        270 => (pos.0, -pos.1, pos.2),
-        _ => panic!("Unsupported rotation {:?}", rotation),
-    }
+    
+    pos
 }
 
 fn compute_node_diffs(scanners: &[Vec<Position>]) -> Vec<Vec<Vec<HashSet<Position>>>> {
@@ -175,9 +182,9 @@ fn day19(mut scanners: Vec<Vec<Position>>, required_matches: usize) -> usize {
             merged_spaces.insert(s1);
 
             println!(
-                "Added {} in orientation {} nodes to {}, which now has {} nodes",
+                "Added {} in orientation {:?} nodes to {}, which now has {} nodes",
                 s1,
-                s1_dir,
+                get_transform_by_id(s1_dir),
                 s2,
                 scanners[s2].len()
             );
@@ -203,7 +210,7 @@ fn find_match_threshold(
 ) -> Option<(Orientation, usize, usize)> {
     for (id1, orientation1) in s1_diffs.iter().enumerate() {
         for (n1idx, n1) in orientation1.iter().enumerate() {
-            for (n2idx, n2) in s2_diffs[0].iter().enumerate() {
+            for (n2idx, n2) in s2_diffs[0].iter().enumerate() { // ???
                 // count number of diffs which match between n1 and n2
                 let count = n1.iter().filter(|x| n2.contains(x)).count();
                 // required_matches -1 because n1/n2 are implied to match
@@ -266,6 +273,29 @@ fn day19_example2() {
     let input = read_input(&input);
 
     assert_eq!(day19(input, 6), 6);
+}
+#[test]
+fn day19_example2_1() {
+    let input = std::fs::read_to_string("./input/day19_example1.txt").unwrap();
+
+    let input = read_input(&input);
+
+    for (s1idx, s1) in input.iter().enumerate() {
+        for (s2idx, s2) in input.iter().enumerate() {
+            if s1idx == s2idx {
+                continue;
+            }
+            for orientation in 0..24 {
+                let rotated: Vec<Position> = s1.iter().map(|x| transform_by_id(orientation, x)).collect();
+
+                if *s2 == rotated {
+                    println!("{} rotated by {:?} matches {}", s1idx, get_transform_by_id(orientation), s2idx);
+                }
+            }
+        }
+    }
+
+    //assert_eq!(day19(input, 6), 6);
 }
 
 #[test]
