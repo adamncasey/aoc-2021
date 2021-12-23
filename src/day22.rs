@@ -23,8 +23,8 @@ fn day22(instrs: Vec<Instruction>) -> usize {
                         continue;
                     }
                     let (x, y, z) = ((x + 50) as usize, (y + 50) as usize, (z + 50) as usize);
-                    println!("{} {} {}", x, y, z);
-                    reactor[x * 101 * y * 101 + z] = instr.set_on;
+                    //println!("{} {} {}", x, y, z);
+                    reactor[x * 101 * 101 + y * 101 + z] = instr.set_on;
                 }
             }
         }
@@ -77,5 +77,5 @@ fn day22_actual() {
 
     let input = read_input(&input);
 
-    assert_eq!(day22(input), 1615);
+    assert_eq!(day22(input), 580098);
 }
