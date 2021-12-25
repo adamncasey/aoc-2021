@@ -12,7 +12,7 @@ struct Aabb {
 impl Aabb {
     fn num_squares(&self) -> (usize, usize) {
         let total = self.calc_volume();
-        dbg!(total);
+        //dbg!(total);
         let mut total_lit = if self.on { total } else { 0 };
         
         for child in &self.children {
@@ -22,7 +22,7 @@ impl Aabb {
             }
             total_lit += lit;
         }
-        dbg!((total, total_lit));
+        //dbg!((total, total_lit));
         (total, total_lit)
     }
 
@@ -63,14 +63,12 @@ impl Aabb {
 
         let mut remaining = Vec::new();
         if other.x_range.0 < self.x_range.0 {
-            println!("1");
             // aabb of everything but x_range.1 clamped to self.x_range.0
             let mut new = other.clone();
             new.x_range.1 = self.x_range.0 - 1;
             remaining.push(new);
         }
         if other.x_range.1 > self.x_range.1 {
-            println!("2");
             // aabb of everything but x_range.0 clamped to self.x_range.1
             let mut new = other.clone();
             new.x_range.0 = self.x_range.1 + 1;
@@ -78,7 +76,6 @@ impl Aabb {
         }
 
         if other.y_range.0 < self.y_range.0 {
-            println!("3");
             // aabb of (self.x_range, y_range.1 clamped to self.y_range.0), other.z_range)
             let mut new = other.clone();
             new.x_range = intersection.x_range;
@@ -86,7 +83,6 @@ impl Aabb {
             remaining.push(new);
         }
         if other.y_range.1 > self.y_range.1 {
-            println!("4");
             // aabb of (self.x_range, y_range.0 clamped to self.y_range.1), other.z_range)
             let mut new = other.clone();
             new.x_range = intersection.x_range;
@@ -94,7 +90,6 @@ impl Aabb {
             remaining.push(new);
         }   
         if other.z_range.0 < self.z_range.0 {
-            println!("5");
             // aabb of (self.x_range, self.y_range, z_range.1 clamped to self.z_range.0)
             let mut new = other.clone();
             new.x_range = intersection.x_range;
@@ -104,7 +99,6 @@ impl Aabb {
             remaining.push(new);
         }
         if other.z_range.1 > self.z_range.1 {
-            println!("6");
             // aabb of (self.x_range, self.y_range, z_range.0 clamped to self.z_range.1)
             let mut new = other.clone();
             new.x_range = intersection.x_range;
@@ -136,6 +130,10 @@ impl Aabb {
         }
 
         remaining
+    }
+
+    fn boxes(&self) -> usize {
+        1 + self.children.iter().map(|x| x.boxes()).sum::<usize>()
     }
 }
 
@@ -171,6 +169,8 @@ fn day22_2(aabbs: Vec<Aabb>) -> usize {
     }
 
     println!("{:?}", root_aabb);
+    
+    println!("{}", root_aabb.boxes());
 
     root_aabb.num_squares().1
 }
