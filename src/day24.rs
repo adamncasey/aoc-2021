@@ -1,42 +1,6 @@
 use std::collections::HashSet;
 use std::collections::HashMap;
 
-/*enum Instruction {
-    Add {
-        a: Register,
-        b: Operand,
-    },
-    Mul {
-        a: Register,
-        b: Operand,
-    },
-    Div {
-        a: Register,
-        b: Operand,
-    },
-    Mod {
-        a: Register,
-        b: Operand,
-    },
-    Eql {
-        a: Register,
-        b: Operand
-    }
-}
-
-enum Register {
-    W,
-    X,
-    Y,
-    Z
-}
-
-enum Operand {
-    Register(Register),
-    Immediate(i64)
-}
-*/
-
 struct Variation {
     div_z: i64, // 1 or 26
     add_x: i64,
