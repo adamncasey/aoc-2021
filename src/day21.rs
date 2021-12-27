@@ -36,7 +36,7 @@ fn day21(p1_start: usize, p2_start: usize) -> usize {
         if new_state.p1_score >= 1000 {
             return new_state.p2_score * dice.total_throws;
         }
-        
+
         let p2_throw = dice.throw() + dice.throw() + dice.throw();
         let new_state = new_state.play_p2(p2_throw);
 
@@ -118,20 +118,19 @@ fn day21_2(p1_start: usize, p2_start: usize) -> usize {
         let mut next_scores = HashMap::new();
         for (state, count) in current_scores {
             for (p1_throw, p1_count) in &possibilities {
-
                 let p1_state = state.play_p1(*p1_throw);
 
                 if p1_state.p1_score >= 21 {
                     p1_won += count * p1_count;
                 } else {
-                    
                     for (p2_throw, p2_count) in &possibilities {
                         let p2_state = p1_state.play_p2(*p2_throw);
 
                         if p2_state.p2_score >= 21 {
                             p2_won += count * p1_count * p2_count;
                         } else {
-                            *next_scores.entry(p2_state).or_default() += count * p1_count * p2_count;
+                            *next_scores.entry(p2_state).or_default() +=
+                                count * p1_count * p2_count;
                         }
                     }
                 }
@@ -173,8 +172,5 @@ fn day21_2_actual() {
 fn day21_calc_possibilities() {
     let possibilities = calc_dice_possibilities();
 
-    assert_eq!(
-        possibilities.values().sum::<usize>(),
-        (3 * 3 * 3)
-    );
+    assert_eq!(possibilities.values().sum::<usize>(), (3 * 3 * 3));
 }

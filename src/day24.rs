@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 struct Variation {
     div_z: i64, // 1 or 26
@@ -54,7 +54,12 @@ fn calc_routes(digits: Vec<Variation>) -> Vec<HashMap<i64, Vec<(i64, i64)>>> {
     targets.insert(0);
 
     for d in (0..=13).rev() {
-        println!("Searching digit {}/{} for {:?}", d+1, digits.len(), targets);
+        println!(
+            "Searching digit {}/{} for {:?}",
+            d + 1,
+            digits.len(),
+            targets
+        );
         let mut new_targets = HashSet::new();
 
         let mut digit_routes: HashMap<i64, Vec<(i64, i64)>> = HashMap::new();
@@ -65,7 +70,10 @@ fn calc_routes(digits: Vec<Variation>) -> Vec<HashMap<i64, Vec<(i64, i64)>>> {
                 if targets.contains(&result) {
                     println!("Step {} digit{} in_z{} out_z{}", d, w, z, result);
                     new_targets.insert(z);
-                    digit_routes.entry(z).or_insert_with(Vec::new).push((w, result));
+                    digit_routes
+                        .entry(z)
+                        .or_insert_with(Vec::new)
+                        .push((w, result));
                 }
             }
         }
@@ -78,7 +86,6 @@ fn calc_routes(digits: Vec<Variation>) -> Vec<HashMap<i64, Vec<(i64, i64)>>> {
 }
 
 fn day24(digits: Vec<Variation>) -> Vec<i64> {
-
     // map z_input -> [(digit, z_output)]
     let routes = calc_routes(digits);
 
@@ -87,7 +94,7 @@ fn day24(digits: Vec<Variation>) -> Vec<i64> {
     let mut z_in = 0;
     for options in routes.iter().rev() {
         println!("{:?}", options);
-        let mut best_step = (0,0);
+        let mut best_step = (0, 0);
         for step in options.get(&z_in).unwrap() {
             if step.0 > best_step.0 {
                 best_step = *step;
@@ -102,7 +109,6 @@ fn day24(digits: Vec<Variation>) -> Vec<i64> {
     digits
 }
 
-
 fn day24_2(digits: Vec<Variation>) -> Vec<i64> {
     // map z_input -> [(digit, z_output)]
     let routes = calc_routes(digits);
@@ -112,7 +118,7 @@ fn day24_2(digits: Vec<Variation>) -> Vec<i64> {
     let mut z_in = 0;
     for options in routes.iter().rev() {
         println!("{:?}", options);
-        let mut best_step = (10,0);
+        let mut best_step = (10, 0);
         for step in options.get(&z_in).unwrap() {
             if step.0 < best_step.0 {
                 best_step = *step;
@@ -154,7 +160,10 @@ fn day24_actual() {
 
     let digit_programs = read_input(&input);
 
-    assert_eq!(day24(digit_programs), vec![9,9,9,1,9,6,9,2,4,9,6,9,3,9]);
+    assert_eq!(
+        day24(digit_programs),
+        vec![9, 9, 9, 1, 9, 6, 9, 2, 4, 9, 6, 9, 3, 9]
+    );
 }
 
 #[test]
@@ -163,5 +172,8 @@ fn day24_2_actual() {
 
     let digit_programs = read_input(&input);
 
-    assert_eq!(day24_2(digit_programs), vec![8,1,9,1,4,1,1,1,1,6,1,7,1,4]);
+    assert_eq!(
+        day24_2(digit_programs),
+        vec![8, 1, 9, 1, 4, 1, 1, 1, 1, 6, 1, 7, 1, 4]
+    );
 }

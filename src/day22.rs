@@ -1,4 +1,4 @@
-use std::cmp::{min, max};
+use std::cmp::{max, min};
 
 #[derive(Debug, Clone)]
 struct Aabb {
@@ -14,7 +14,7 @@ impl Aabb {
         let total = self.calc_volume();
         //dbg!(total);
         let mut total_lit = if self.on { total } else { 0 };
-        
+
         for child in &self.children {
             let (total, lit) = child.num_squares();
             if self.on {
@@ -27,7 +27,9 @@ impl Aabb {
     }
 
     fn calc_volume(&self) -> usize {
-        (self.x_range.1 - self.x_range.0 + 1) as usize * (self.y_range.1 - self.y_range.0 + 1) as usize * (self.z_range.1 - self.z_range.0 + 1) as usize
+        (self.x_range.1 - self.x_range.0 + 1) as usize
+            * (self.y_range.1 - self.y_range.0 + 1) as usize
+            * (self.z_range.1 - self.z_range.0 + 1) as usize
     }
 
     fn does_intersect(&self, other: &Aabb) -> bool {
@@ -45,8 +47,7 @@ impl Aabb {
     /// Intersects `self` with `other`
     ///
     /// returns (other inside of self, list of Aabbs remaining outside of self)
-    fn intersect(&self, other: Aabb) -> (Option<Aabb>, Vec<Aabb>)
-    {
+    fn intersect(&self, other: Aabb) -> (Option<Aabb>, Vec<Aabb>) {
         if !self.does_intersect(&other) {
             return (None, vec![other]);
         }
@@ -55,9 +56,18 @@ impl Aabb {
 
         let intersection = Aabb {
             on: other.on,
-            x_range: (max(self.x_range.0, other.x_range.0), min(self.x_range.1, other.x_range.1)),
-            y_range: (max(self.y_range.0, other.y_range.0), min(self.y_range.1, other.y_range.1)),
-            z_range: (max(self.z_range.0, other.z_range.0), min(self.z_range.1, other.z_range.1)),
+            x_range: (
+                max(self.x_range.0, other.x_range.0),
+                min(self.x_range.1, other.x_range.1),
+            ),
+            y_range: (
+                max(self.y_range.0, other.y_range.0),
+                min(self.y_range.1, other.y_range.1),
+            ),
+            z_range: (
+                max(self.z_range.0, other.z_range.0),
+                min(self.z_range.1, other.z_range.1),
+            ),
             children: Vec::new(),
         };
 
@@ -88,7 +98,7 @@ impl Aabb {
             new.x_range = intersection.x_range;
             new.y_range.0 = self.y_range.1 + 1;
             remaining.push(new);
-        }   
+        }
         if other.z_range.0 < self.z_range.0 {
             // aabb of (self.x_range, self.y_range, z_range.1 clamped to self.z_range.0)
             let mut new = other.clone();
@@ -108,7 +118,7 @@ impl Aabb {
             remaining.push(new);
         }
         //println!("intersect yep {:?} {:?} {:?} {:?}", self, other, &intersection, &remaining);
-        
+
         //dbg!((start_vol, intersection.calc_volume(), remaining.iter().map(|x| x.calc_volume()).sum::<usize>()));
 
         (Some(intersection), remaining)
@@ -163,20 +173,19 @@ fn day22_2(aabbs: Vec<Aabb>) -> usize {
         z_range: (-500000, 500000),
         children: Vec::new(),
     };
-    
+
     for aabb in aabbs {
         root_aabb.insert(aabb);
     }
 
     println!("{:?}", root_aabb);
-    
+
     println!("{}", root_aabb.boxes());
 
     root_aabb.num_squares().1
 }
 
 fn read_input(input: &str) -> Vec<Aabb> {
-
     let mut aabbs = Vec::new();
 
     for instr in input.lines() {
@@ -186,9 +195,18 @@ fn read_input(input: &str) -> Vec<Aabb> {
 
         let (ys, zs) = rest.split_once(",z=").unwrap();
 
-        let xbounds = xs.split("..").map(|n| str::parse::<i32>(n).unwrap()).collect::<Vec<i32>>();
-        let ybounds = ys.split("..").map(|n| str::parse::<i32>(n).unwrap()).collect::<Vec<i32>>();
-        let zbounds = zs.split("..").map(|n| str::parse::<i32>(n).unwrap()).collect::<Vec<i32>>();
+        let xbounds = xs
+            .split("..")
+            .map(|n| str::parse::<i32>(n).unwrap())
+            .collect::<Vec<i32>>();
+        let ybounds = ys
+            .split("..")
+            .map(|n| str::parse::<i32>(n).unwrap())
+            .collect::<Vec<i32>>();
+        let zbounds = zs
+            .split("..")
+            .map(|n| str::parse::<i32>(n).unwrap())
+            .collect::<Vec<i32>>();
 
         aabbs.push(Aabb {
             on: on_off == "on",
@@ -321,28 +339,28 @@ fn day22_2_actual() {
 fn day22_aabb_intersect() {
     let aabb = Aabb {
         on: true,
-        x_range: (1,1),
-        y_range: (1,1),
-        z_range: (1,1),
+        x_range: (1, 1),
+        y_range: (1, 1),
+        z_range: (1, 1),
         children: Vec::new(),
     };
 
     let aabb2 = Aabb {
         on: true,
-        x_range: (0,2),
-        y_range: (0,2),
-        z_range: (0,2),
+        x_range: (0, 2),
+        y_range: (0, 2),
+        z_range: (0, 2),
         children: Vec::new(),
     };
 
     let (intersect, remainder) = aabb.intersect(aabb2);
 
     // [
-    //Aabb { on: true, x_range: (0, 0), y_range: (0, 2), z_range: (0, 2), children: [] }, 
-    //Aabb { on: true, x_range: (2, 2), y_range: (0, 2), z_range: (0, 2), children: [] }, 
-    //Aabb { on: true, x_range: (1, 1), y_range: (0, 0), z_range: (0, 2), children: [] }, 
-    //Aabb { on: true, x_range: (1, 1), y_range: (2, 2), z_range: (0, 2), children: [] }, 
-    //Aabb { on: true, x_range: (1, 1), y_range: (1, 1), z_range: (0, 0), children: [] }, 
+    //Aabb { on: true, x_range: (0, 0), y_range: (0, 2), z_range: (0, 2), children: [] },
+    //Aabb { on: true, x_range: (2, 2), y_range: (0, 2), z_range: (0, 2), children: [] },
+    //Aabb { on: true, x_range: (1, 1), y_range: (0, 0), z_range: (0, 2), children: [] },
+    //Aabb { on: true, x_range: (1, 1), y_range: (2, 2), z_range: (0, 2), children: [] },
+    //Aabb { on: true, x_range: (1, 1), y_range: (1, 1), z_range: (0, 0), children: [] },
     //Aabb { on: true, x_range: (1, 1), y_range: (1, 1), z_range: (2, 2), children: [] }
 
     assert_eq!(intersect.unwrap().calc_volume(), 1);
@@ -351,18 +369,30 @@ fn day22_aabb_intersect() {
 
 #[test]
 fn day22_aabb_intersect2() {
-    let aabb = Aabb { on: true, x_range: (10, 12), y_range: (10, 12), z_range: (10, 12), children: vec![] };
-    
-    let aabb2 = Aabb { on: true, x_range: (11, 13), y_range: (11, 13), z_range: (11, 13), children: vec![] };
+    let aabb = Aabb {
+        on: true,
+        x_range: (10, 12),
+        y_range: (10, 12),
+        z_range: (10, 12),
+        children: vec![],
+    };
+
+    let aabb2 = Aabb {
+        on: true,
+        x_range: (11, 13),
+        y_range: (11, 13),
+        z_range: (11, 13),
+        children: vec![],
+    };
 
     let (intersect, remainder) = aabb.intersect(aabb2.clone());
 
     // [
-    //Aabb { on: true, x_range: (0, 0), y_range: (0, 2), z_range: (0, 2), children: [] }, 
-    //Aabb { on: true, x_range: (2, 2), y_range: (0, 2), z_range: (0, 2), children: [] }, 
-    //Aabb { on: true, x_range: (1, 1), y_range: (0, 0), z_range: (0, 2), children: [] }, 
-    //Aabb { on: true, x_range: (1, 1), y_range: (2, 2), z_range: (0, 2), children: [] }, 
-    //Aabb { on: true, x_range: (1, 1), y_range: (1, 1), z_range: (0, 0), children: [] }, 
+    //Aabb { on: true, x_range: (0, 0), y_range: (0, 2), z_range: (0, 2), children: [] },
+    //Aabb { on: true, x_range: (2, 2), y_range: (0, 2), z_range: (0, 2), children: [] },
+    //Aabb { on: true, x_range: (1, 1), y_range: (0, 0), z_range: (0, 2), children: [] },
+    //Aabb { on: true, x_range: (1, 1), y_range: (2, 2), z_range: (0, 2), children: [] },
+    //Aabb { on: true, x_range: (1, 1), y_range: (1, 1), z_range: (0, 0), children: [] },
     //Aabb { on: true, x_range: (1, 1), y_range: (1, 1), z_range: (2, 2), children: [] }
 
     let remainder_vol = remainder.iter().map(|x| x.calc_volume()).sum::<usize>();

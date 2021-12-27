@@ -95,7 +95,7 @@ fn day11_2(octo: &mut Vec<Vec<u32>>, _days: usize) -> usize {
     }
 }
 
-fn read_input<'a>(input: String) -> Vec<Vec<u32>> {
+fn read_input(input: &str) -> Vec<Vec<u32>> {
     let input: Vec<Vec<u32>> = input
         .split("\n")
         .map(|x| {
@@ -120,9 +120,7 @@ fn day11_example() {
 4846848554
 5283751526";
 
-    let mut input = read_input(input.to_string());
-    //assert_eq!(day11(&mut input, 1), 0);
-    //assert_eq!(day11(&mut input, 1), 20);
+    let mut input = read_input(input);
 
     assert_eq!(day11(&mut input, 100), 1656);
 }
@@ -131,7 +129,7 @@ fn day11_example() {
 fn day11_actual() {
     let input = std::fs::read_to_string("./input/day11.txt").unwrap();
 
-    let mut input = read_input(input.to_string());
+    let mut input = read_input(&input);
 
     assert_eq!(day11(&mut input, 100), 1615);
 }
@@ -149,7 +147,7 @@ fn day11_2_example() {
 4846848554
 5283751526";
 
-    let mut input = read_input(input.to_string());
+    let mut input = read_input(input);
 
     assert_eq!(day11_2(&mut input, 100), 195);
 }
@@ -158,7 +156,7 @@ fn day11_2_example() {
 fn day11_2_actual() {
     let input = std::fs::read_to_string("./input/day11.txt").unwrap();
 
-    let mut input = read_input(input.to_string());
+    let mut input = read_input(&input);
 
     assert_eq!(day11_2(&mut input, 100), 249);
 }
