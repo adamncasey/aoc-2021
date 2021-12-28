@@ -160,5 +160,5 @@ fn day25_actual() {
 
     let (cells, height, width) = read_input(&input);
 
-    assert_eq!(day25(cells, height, width, 1000000), 1615);
+    assert_eq!(day25(cells, height, width, 1000000), 507);
 }
